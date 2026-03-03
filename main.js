@@ -1,76 +1,111 @@
-const SIZE = 15;
-let board = Array(SIZE).fill().map(() => Array(SIZE).fill(null));
-let currentPlayer = 'black';
-let gameOver = false;
+var s = 15,
+    board = document.getElementsByClassName('board')[0],
+    stt = document.getElementsByClassName('status')[0];
 
-const boardEl = document.getElementById('board');
-const statusEl = document.getElementById('status');
+// the board and player move is stored in a 2D array (a)
+var a, cur = 'X';
 
-function createBoard() {
-    boardEl.innerHTML = '';
-    for (let r = 0; r < SIZE; r++) {
-        for (let c = 0; c < SIZE; c++) {
+function createBoard(){
+    a = [];
+    stt.innerText = (cur == 'X' ? "X" : "O") + " turn to move!";
+    for(let i = 0; i < s; i++){
+        a[i] = [];
+        for(let j = 0; j < s; j++){
+            // unchecked cells' value = 0
+            a[i][j] = 0;
+            //create cells for the board
             const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.onclick = () => handleMove(r, c, cell);
-            boardEl.appendChild(cell);
+            cell.className = `cell ${i}-${j}`;
+            cell.onclick = () => handleMove(i, j, cell);
+            board.appendChild(cell);
         }
     }
 }
+function handleMove(i, j, cell){
+    // the current player is "O" if not "X"
+    var player = (cur == 'X') ? "X" : 'O';
+    // if X has made a move then it's O to go next
+    cur = (cur == "X") ? "O" : "X";
 
-function handleMove(r, c, cell) {
-    if (board[r][c] || gameOver) return;
+    stt.classList.toggle('opponent');
+    stt.innerHTML = cur + " turn to move!";
+    
+    // add some attribute to the checked cell
+    cell.classList.add(player);
+    cell.innerHTML = player;
 
-    board[r][c] = currentPlayer;
-    const stone = document.createElement('div');
-    stone.className = `stone ${currentPlayer}`;
-    cell.appendChild(stone);
+    
+    // 1 is for X and 2 is for O
+    a[i][j] = (player == "X") ? 1 : 2;
+    checkwin(i, j);
+}
 
-    if (checkWin(r, c)) {
-        statusEl.innerText = `${currentPlayer.toUpperCase()} WINS!`;
-        gameOver = true;
-        return;
+function checkwin(i, j){
+    // check for horizon and vertical direction\
+    // the idea is to check only from the last move placed
+    var ch = 0, cv = 0;
+    var chmax = 0, cvmax = 0;
+    
+    // loop vertically and horizonly from the last move placed through the 2d array
+    for(var k = 0; k < s; k++){
+        if(a[k][j] == a[i][j]){
+            cv++;
+            if(cv == 5){
+                alert(`${cur == "X" ? 'O' : "X"} wins!`);
+                for(var t = 0; t < 5; t++){
+                    document.getElementsByClassName(`${k - t}-${j}`)[0].classList.add('win');
+                }
+            }
+        } else {
+            cv = 0;
+        }
+        if(a[i][k] == a[i][j]){
+            ch++;
+            if(ch == 5){
+                alert(`${cur == "X" ? 'O' : "X"} wins!`);
+                for(var t = 0; t < 5; t++){
+                    document.getElementsByClassName(`${i}-${k-t}`)[0].classList.add('win');
+                }
+            }
+        } else {
+            ch = 0;
+        }
     }
-
-    currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
-    statusEl.innerText = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s Turn`;
+    // check positive diagonal and negative diagonal
+    checkd(i, j, 1, 1);
+    checkd(i, j, 1, -1);
 }
 
-function checkWin(r, c) {
-    const directions = [
-        [0, 1], // Horizontal
-        [1, 0], // Vertical
-        [1, 1], // Diagonal \
-        [1, -1] // Diagonal /
-    ];
-
-    return directions.some(([dr, dc]) => {
-        let count = 1;
-        // Check both directions (forward and backward)
-        count += countStones(r, c, dr, dc);
-        count += countStones(r, c, -dr, -dc);
-        return count >= 5;
-    });
-}
-
-function countStones(r, c, dr, dc) {
-    let count = 0;
-    let nr = r + dr;
-    let nc = c + dc;
-    while (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc] === currentPlayer) {
-        count++;
-        nr += dr;
-        nc += dc;
+function checkd(pi, pj, d1, d2){
+    var x = pi, y = pj, z = pi, t = pj, f = 1, b = 0;
+    for(var i = 0; i < 5; i++){
+        x += d1;
+        y += d2;
+        if(x >= s || y >= s) break;
+        if(a[x][y] == a[pi][pj]){
+            f++;
+        } else {
+            break;
+        }
     }
-    return count;
+    for(var i = 0; i < 5; i++){
+        z -= d1;
+        t -= d2;
+        if(z < 0 || t < 0) break;
+        if(a[z][t] == a[pi][pj]){
+            b++;
+        } else {
+            break;
+        }
+    }
+    if(f + b == 5){
+        alert(`${cur == "X" ? 'O' : "X"} wins!`);
+        for(var i = 0; i < 5; i++){
+            z+= d1; t+= d2;
+            console.log(z, t);
+            document.getElementsByClassName(`${z}-${t}`)[0].classList.add('win');
+        }
+    }
+    return f + b;
 }
-
-function resetGame() {
-    board = Array(SIZE).fill().map(() => Array(SIZE).fill(null));
-    currentPlayer = 'black';
-    gameOver = false;
-    statusEl.innerText = "Black's Turn";
-    createBoard();
-}
-
 createBoard();
