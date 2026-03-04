@@ -1,9 +1,33 @@
+:root{
+  --red:rgb(255, 75, 75);
+  --green:rgb(88, 233, 88);
+  --cell:rgb(27, 27, 27);
+}
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+*{
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
 *{
   padding:0;
   margin:0;
 }
 body{
-  background:#3f3f3f;
+  background:#353535;
+}
+.header{
+  display:flex;
+  justify-content:center;
 }
 .ctn{
   display:flex;
@@ -19,31 +43,58 @@ body{
   grid-template-rows:repeat(15, 30px);
   margin:5px;
   margin-top:20px;
-  border:5px solid black;
+  border:5px solid rgb(34, 34, 34);
   width:fit-content;
 }
 .cell{
-  background:white;
+  background:var(--cell);
   width:30px;
   height:30px;
-  border:1px solid gray;
+  border:1px solid rgba(150,150,150,.5);
   display:flex;
   justify-content:center;
   align-items:center;
+  font-size:22px;
+}
+.cell:hover{
+  background:rgb(43, 43, 43);
 }
 .cell.X{
-  color:red;
+  color:var(--red);
+  animation:emerge 200ms 1 ease-in-out;
 }
 .cell.O{
-  color:green;
+  color:var(--green);
+  font-size:20px;
+  animation:emerge 200ms ease-in-out;
 }
-.move{
-  width:10px;
-  height:10px;
-  background:green;
+.cell.X:hover, .cell.O:hover{
+  background:var(--cell);
+
 }
-.win{
-  background:rgb(255, 201, 201);
+.menu{
+  display:flex;
+  justify-content:center;
+  margin:20px 0;
+}
+.start-btn{
+  padding:5px 7px;
+  border:none;
+  background:rgb(15, 66, 0);
+  color:white;
+  border:2px solid rgb(16, 141, 0);
+}
+@keyframes emerge{
+  0%{
+    transform:scale(3);
+    opacity:0;
+  }
+  70%{
+    opacity:0.3;
+  }
+  100%{
+
+  }
 }
 .header h1{
   font-size:25px;
@@ -53,8 +104,42 @@ body{
 .status{
   display:flex;
   justify-content:center;
-  color:red;
 }
-.status.opponent{
-  color:rgb(101, 226, 101);
+.s-container{
+  display:flex;
+  justify-content:space-between;
+  width:180px;
+  position:relative;
+}
+.s-container:before{
+  content:'';
+  background:rgba(255,255,255,.2);
+  position:absolute;
+  width:100px;
+  height:50px;
+  left:-20px;
+  top:-5px;
+  border:3px solid red;
+  transition:all 500ms;
+}
+.s-container.player-2:before{
+  left:auto;
+  left:95px;
+  border:3px solid rgb(51, 214, 51);
+}
+.player-name{
+  color:white;
+  text-align:center;
+}
+.player-name span{
+  font-weight:bold;
+}
+.last-move{
+  background:#414141 !important;
+}
+.cell.X.win{
+  background:rgb(77, 37, 37) !important;
+}
+.cell.O.win{
+  background:rgb(39, 66, 47) !important;
 }
