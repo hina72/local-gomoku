@@ -1,4 +1,16 @@
-var s = 15,
+// handle input on change
+var sizeInp = document.getElementById('size'),
+    tme = document.getElementById('set-time');
+sizeInp.oninput = () => {
+    s = parseInt(sizeInp.value);
+}
+tme.oninput = () => {
+    time = parseInt(tme.value);
+}
+
+// declare game variable
+let time = parseInt(tme.value);
+var s = parseInt(sizeInp.value),
     board = document.getElementsByClassName('board')[0],
     stt = document.getElementsByClassName('status')[0];
 
@@ -53,10 +65,7 @@ function handleMove(i, j, cell){
    // cell.appendChild(cellContent);
 
     cell.innerText = player;
-    
-    
-    
-    console.log(a[i][j] - 1);
+
     countDown(a[i][j] - 1);
     checkwin(i, j);
 
@@ -77,7 +86,7 @@ function checkwin(i, j){
         if(a[k][j] == a[i][j]){
             cv++;
             if(cv == 5){
-                alert(`${cur == "X" ? 'O' : "X"} wins!`);
+                gameOver(`${cur == "X" ? 1 : 0}`, 'getting 5 in a row');
         // add classname to highlight the winning position
 
                 for(var t = 0; t < 5; t++){
@@ -90,7 +99,8 @@ function checkwin(i, j){
         if(a[i][k] == a[i][j]){
             ch++;
             if(ch == 5){
-                alert(`${cur == "X" ? 'O' : "X"} wins!`);
+                gameOver(`${cur == "X" ? 1 : 0}`, 'getting 5 in a row');
+
         // add classname to highlight the winning position
                 for(var t = 0; t < 5; t++){
                     document.getElementsByClassName(`${i}-${k-t}`)[0].classList.add('win');
@@ -135,11 +145,10 @@ function checkd(pi, pj, d1, d2){
     }
     // if there is 5 consecutive, being more or less than that number shoudn't count
     if(f + b == 5){
-        alert(`${cur == "X" ? 'O' : "X"} wins!`);
+        gameOver(`${cur == "X" ? 1 : 0}`, 'getting 5 in a row');
         // add classname to highlight the winning position
         for(var i = 0; i < 5; i++){
             z+= d1; t+= d2;
-            console.log(z, t);
             document.getElementsByClassName(`${z}-${t}`)[0].classList.add('win');
         }
     }
@@ -150,7 +159,7 @@ function checkd(pi, pj, d1, d2){
 //var eltest = document.getElementsByClassName('el-test')[0];
 var timer = document.getElementsByClassName('timer');
 const cnt = [];
-let time = 300;
+
 
 // counting down the 2 timer clock
 function countDown(id){
@@ -165,6 +174,11 @@ function countDown(id){
     cnt[id] = setInterval(() => {
         sec--;
         timer[id].innerText = btfTime(sec);
+        if(sec <= 0){
+            // in case a player run out of time
+            gameOver(`${cur == "X" ? 1 : 0}`, `time out`);
+            clearInterval(cnt[id]);
+        }
     }, 1000);
 }
 
@@ -180,8 +194,24 @@ function addzero(num){
 
 
 board.style.display = 'none';
-function startGame(){
+var menu = document.getElementsByClassName('menu')[0],
+    rbtn = document.getElementById('restart'),
+    fter = document.getElementsByClassName('footer')[0];
+
+function startGame(boardSize){
     a = [];
+    cur = 'X';
+    // hide/show some DOM when game start or restart
+    scnt.classList.remove('player-2');
+    fter.style.display = 'none';
+    menu.style.display = 'none';
+    stt.style.display = 'flex';
+    rbtn.style.display = 'none';
+    // board size as selected
+    s = boardSize;
+    board.style.gridTemplateColumns = `repeat(${boardSize}, 30px)`;
+    board.style.gridTemplateRows = `repeat(${boardSize}, 30px)`;
+
     board.style.display = 'grid';
     clearInterval(cnt[0]);
     clearInterval(cnt[1]);
@@ -189,5 +219,33 @@ function startGame(){
     timer[1].innerText = btfTime(time);
     createBoard();
     countDown(0);
+}
+
+// game over alert function
+var altEl = document.getElementsByClassName('game-over')[0];
+function alt(txt){
+    altEl.innerText = txt;
+    altEl.classList.add('appear');
+}
+
+var pname = [
+    'Player X',
+    'Player O'
+];
+var pnameclass = [
+    'xwin',
+    'owin'
+];
+//game over function
+function gameOver(id, by){
+    alt(`${pname[id]} won by ${by}!`);
+    altEl.classList.add(pnameclass[id]);
+    clearInterval(cnt[0]);
+    clearInterval(cnt[1]);
+    Array.from(board.children).forEach(cell => {
+        cell.onclick = null;
+    });
+
+    rbtn.style.display = 'flex';
 }
 
