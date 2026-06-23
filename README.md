@@ -1,5 +1,5 @@
 # Local Gomoku
-[PLAY NOW](https://hina72.github.io/local-gomoku)\
+[Play now!](https://hina72.github.io/local-gomoku)
 
 2 Players play on the same device, who get 5 in a row first win!\
 3 Board size options (10x10) (15x15) (20x20)\
